@@ -1,0 +1,47 @@
+version: '3'
+services:
+  user-db:
+    image: mysql:8.0.17
+    volumes:
+      - user-data:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: user_DB
+      TZ: Asia/Tokyo
+    ports:
+      - "4306:3306"
+  user:
+    build:
+      context: .
+      dockerfile: Dockerfile.fresh
+    volumes:
+      - ./src/.:/app
+    depends_on:
+      - user-db
+    tty: true
+    environment:
+      TZ: Asia/Tokyo
+      JWT_KEY: jwtkey
+      EXP_SEC: 3600
+      RT_EXP_SEC: 864000
+      DB_DBMS: mysql
+      DB_PASS: password
+      DB_NAME: user_DB
+      DB_PORT: 3306
+      DB_HOST: user-db
+      DB_USER: root
+      DB_CONN_OPT: charset=utf8mb4&parseTime=True&loc=Local
+      TIMEOUT: 2
+      LISTEN_PORT: 50051
+      DEBUG: "true"
+
+    ports:
+      - "50051:50051"
+  grpcurl:
+    image: networld/grpcurl
+    command: /grpcurl -plaintext -d '{"name":"vdvds", "email":"csackbkjnsacs@xs.cs", "password":"cascscssd"}' -H "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1NzczNDQ1NzEsImlzcyI6InJlZnJlc2hUb2tlbiIsInN1YiI6IjIzIn0.w0gAwAkMymK6iZxwjENP7AqsvEHgmLw3lqN2f6bWw1I" user:50051 user_grpc.UserService/Create
+    tty: true
+volumes:
+  user-data:
+    driver: local
