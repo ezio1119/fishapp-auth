@@ -5,6 +5,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/ezio1119/fishapp-user/conf"
 	"github.com/ezio1119/fishapp-user/middleware"
 	_userGrpcDeliver "github.com/ezio1119/fishapp-user/user/delivery/grpc"
 	_userRepo "github.com/ezio1119/fishapp-user/user/repository"
@@ -13,31 +14,17 @@ import (
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_validator "github.com/grpc-ecosystem/go-grpc-middleware/validator"
 	"github.com/jinzhu/gorm"
-	"github.com/kelseyhightower/envconfig"
 	"google.golang.org/grpc"
 )
 
-type env struct {
-	DbPass     string `required:"true" split_words:"true"`
-	DbDbms     string `required:"true" split_words:"true"`
-	DbUser     string `required:"true" split_words:"true"`
-	DbName     string `required:"true" split_words:"true"`
-	DbPort     string `required:"true" split_words:"true"`
-	DbHost     string `required:"true" split_words:"true"`
-	DbConnOpt  string `required:"true" split_words:"true"`
-	Timeout    int64  `required:"true"`
-	ListenPort string `required:"true" split_words:"true"`
-	Debug      bool   `required:"true"`
-}
-
 func main() {
-	var env env
-	err := envconfig.Process("", &env)
+	conf.Readconf()
+	CONNECT := conf.C.Db.User + ":" + conf.C.Db.Pass + "@(" + conf.C.Db.Host + ":" + conf.C.Db.Port + ")/" + conf.C.Db.Name + "?" + conf.C.Db.ConnOpt
+	dbConn, err := gorm.Open(conf.C.Db.Dbms, CONNECT)
 	if err != nil {
 		log.Fatal(err)
 	}
-	CONNECT := env.DbUser + ":" + env.DbPass + "@(" + env.DbHost + ":" + env.DbPort + ")/" + env.DbName + "?" + env.DbConnOpt
-	dbConn, err := gorm.Open(env.DbDbms, CONNECT)
+	err = dbConn.DB().Ping()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -48,14 +35,14 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
-	timeoutContext := time.Duration(env.Timeout) * time.Second
+	timeoutContext := time.Duration(conf.C.Sv.Timeout) * time.Second
 	userRepo := _userRepo.NewMysqlUserRepository(dbConn)
 	userUcase := _userUcase.NewUserUsecase(userRepo, timeoutContext)
 	middL := middleware.InitMiddleware()
 
 	gserver := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			middL.LoggerInterceptor(env.Debug),
+			middL.LoggerInterceptor(),
 			middL.AuthInterceptor(),
 			grpc_validator.UnaryServerInterceptor(),
 			middL.RecoveryInterceptor(),
@@ -63,7 +50,7 @@ func main() {
 	)
 	_userGrpcDeliver.NewUserServerGrpc(gserver, userUcase)
 
-	list, err := net.Listen("tcp", ":"+env.ListenPort)
+	list, err := net.Listen("tcp", ":"+conf.C.Sv.Port)
 	if err != nil {
 		log.Fatal(err)
 	}
