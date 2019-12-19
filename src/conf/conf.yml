@@ -1,0 +1,16 @@
+db:
+  dbms: mysql
+  name: user_DB
+  user: root
+  pass: password
+  host: user-db
+  port: 3306
+  conn_opt: charset=utf8mb4&parseTime=True&loc=Local
+sv:
+  timeout: 2
+  port: 50051
+  debug: true
+auth:
+  jwtkey: jwtkey
+  idtoken_exp_sec: 3600
+  rt_exp_sec: 864000
