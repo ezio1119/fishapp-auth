@@ -8,7 +8,7 @@ import (
 )
 
 func (m *GoMiddleware) parseToken(t string) (int64, error) {
-	jwtkey := conf.C.Auth.Jwtkey
+	jwtkey := []byte(conf.C.Auth.Jwtkey)
 	var claims jwt.StandardClaims
 	_, err := jwt.ParseWithClaims(t, &claims, func(token *jwt.Token) (interface{}, error) {
 		return jwtkey, nil

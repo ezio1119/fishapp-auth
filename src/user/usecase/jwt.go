@@ -10,7 +10,7 @@ import (
 )
 
 func (*userUsecase) GenerateTokenPair(id int64) (*models.TokenPair, error) {
-	jwtkey := conf.C.Auth.Jwtkey
+	jwtkey := []byte(conf.C.Auth.Jwtkey)
 	expSec := conf.C.Auth.TokenExpSec
 	rtExpSec := conf.C.Auth.RtExpSec
 	strID := strconv.FormatInt(id, 10)

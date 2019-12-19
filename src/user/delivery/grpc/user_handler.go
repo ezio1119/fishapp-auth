@@ -84,13 +84,13 @@ func (s *server) GetByID(ctx context.Context, in *user_grpc.ID) (*user_grpc.User
 }
 
 func (s *server) Update(ctx context.Context, in *user_grpc.UpdateReq) (*user_grpc.User, error) {
+	userID := ctx.Value("userID").(int64)
 	user := &models.User{
+		ID: userID
 		Name:     in.Name,
 		Email:    in.Email,
 		Password: in.Password,
 	}
-	userID := ctx.Value("userID").(int64)
-	user.ID = userID
 	if err := s.UUsecase.Update(ctx, user); err != nil {
 		return nil, err
 	}
