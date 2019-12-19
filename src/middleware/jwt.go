@@ -1,18 +1,17 @@
 package middleware
 
 import (
-	"os"
 	"strconv"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/ezio1119/fishapp-user/conf"
 )
 
-var jwtKey = []byte(os.Getenv("JWT_KEY"))
-
 func (m *GoMiddleware) parseToken(t string) (int64, error) {
+	jwtkey := conf.C.Auth.Jwtkey
 	var claims jwt.StandardClaims
 	_, err := jwt.ParseWithClaims(t, &claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return jwtkey, nil
 	})
 	if err != nil {
 		return 0, err
