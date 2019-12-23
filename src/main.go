@@ -43,7 +43,6 @@ func main() {
 	gserver := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
 			middL.LoggerInterceptor(),
-			middL.AuthInterceptor(),
 			grpc_validator.UnaryServerInterceptor(),
 			middL.RecoveryInterceptor(),
 		)),
