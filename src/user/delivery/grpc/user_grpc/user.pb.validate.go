@@ -49,8 +49,6 @@ func (m *User) Validate() error {
 
 	// no validation rules for Email
 
-	// no validation rules for Password
-
 	if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
 		if err := v.Validate(); err != nil {
 			return UserValidationError{
