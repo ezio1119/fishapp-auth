@@ -273,6 +273,13 @@ func (m *UpdateReq) Validate() error {
 		return nil
 	}
 
+	if m.GetId() < 1 {
+		return UpdateReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than or equal to 1",
+		}
+	}
+
 	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 10 {
 		return UpdateReqValidationError{
 			field:  "Name",
@@ -756,6 +763,73 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = UserWithTokenValidationError{}
+
+// Validate checks the field values on RefreshToken with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *RefreshToken) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for RefreshToken
+
+	return nil
+}
+
+// RefreshTokenValidationError is the validation error returned by
+// RefreshToken.Validate if the designated constraints aren't met.
+type RefreshTokenValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RefreshTokenValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RefreshTokenValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RefreshTokenValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RefreshTokenValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RefreshTokenValidationError) ErrorName() string { return "RefreshTokenValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RefreshTokenValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRefreshToken.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RefreshTokenValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RefreshTokenValidationError{}
 
 // Validate checks the field values on TokenPair with the rules defined in the
 // proto definition for this message. If any rules are violated, an error is returned.

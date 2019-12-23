@@ -2,20 +2,19 @@ syntax = "proto3";
 package user_grpc;
 import "validate/validate.proto";
 import "google/protobuf/timestamp.proto";
-import "google/protobuf/empty.proto";
 
 
 service UserService {
   rpc Create(CreateReq) returns (UserWithToken);
   rpc GetByID(ID) returns (User);
   rpc Update(UpdateReq) returns (User);
-  rpc Delete(google.protobuf.Empty) returns (DeleteRes);
-  rpc RefreshIDToken(google.protobuf.Empty) returns (TokenPair);
+  rpc Delete(ID) returns (DeleteRes);
+  rpc RefreshIDToken(RefreshToken) returns (TokenPair);
   rpc Login(LoginReq) returns (UserWithToken);
 }
 
 message User {
-  int64 id = 1 ;
+  int64 id = 1;
   string name = 2;
   string email = 3;
   string password = 4;
@@ -30,9 +29,10 @@ message CreateReq {
 }
 
 message UpdateReq {
-  string name = 1 [(validate.rules).string = {min_len: 1, max_len: 10}];
-  string email = 2 [(validate.rules).string.email = true];
-  string password = 3 [(validate.rules).string.pattern = "^[A-Za-z0-9]{6,72}$"]; // 6文字以上72文字以下の英数字
+  int64 id = 1 [(validate.rules).int64.gte = 1];
+  string name = 2 [(validate.rules).string = {min_len: 1, max_len: 10}];
+  string email = 3 [(validate.rules).string.email = true];
+  string password = 4 [(validate.rules).string.pattern = "^[A-Za-z0-9]{6,72}$"]; // 6文字以上72文字以下の英数字
 }
 
 message LoginReq {
@@ -48,9 +48,13 @@ message ID {
   int64 id = 1 [(validate.rules).int64.gte = 1];
 }
 
-message UserWithToken{
+message UserWithToken {
   User user = 1;
   TokenPair tokenPair = 2;
+}
+
+message RefreshToken {
+  string refreshToken = 1;
 }
 
 message TokenPair{
