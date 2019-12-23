@@ -45,7 +45,7 @@ func (u *userUsecase) Create(ctx context.Context, user *models.User) (*models.To
 	if err := u.userRepo.Create(ctx, user); err != nil {
 		return nil, err
 	}
-	tokenPair, err := u.GenerateTokenPair(user.ID)
+	tokenPair, err := u.generateTokenPair(user.ID)
 	if err != nil {
 		return nil, err
 	}
@@ -73,8 +73,9 @@ func (u *userUsecase) Delete(ctx context.Context, id int64) error {
 	return u.userRepo.Delete(ctx, id)
 }
 
-func (u *userUsecase) RefreshIDToken(ctx context.Context, id int64) (*models.TokenPair, error) {
-	tokenPair, err := u.GenerateTokenPair(id)
+func (u *userUsecase) RefreshIDToken(ctx context.Context, rt string) (*models.TokenPair, error) {
+	userID, err := u.validateToken(rt)
+	tokenPair, err := u.generateTokenPair(userID)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +92,7 @@ func (u *userUsecase) Login(ctx context.Context, email string, pass string) (*mo
 	if err := u.compareHashAndPass(user.EncryptedPassword, pass); err != nil {
 		return nil, nil, err
 	}
-	tokenPair, err := u.GenerateTokenPair(user.ID)
+	tokenPair, err := u.generateTokenPair(user.ID)
 	if err != nil {
 		return nil, nil, err
 	}

@@ -12,6 +12,6 @@ type Usecase interface {
 	Update(ctx context.Context, u *models.User) error
 	Create(ctx context.Context, u *models.User) (*models.TokenPair, error)
 	Delete(ctx context.Context, id int64) error
-	RefreshIDToken(ctx context.Context, id int64) (*models.TokenPair, error)
+	RefreshIDToken(ctx context.Context, rt string) (*models.TokenPair, error)
 	Login(ctx context.Context, email string, pass string) (*models.User, *models.TokenPair, error)
 }

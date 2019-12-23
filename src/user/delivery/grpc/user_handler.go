@@ -8,7 +8,6 @@ import (
 	"github.com/ezio1119/fishapp-user/models"
 	"github.com/ezio1119/fishapp-user/user"
 	"github.com/ezio1119/fishapp-user/user/delivery/grpc/user_grpc"
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -86,7 +85,7 @@ func (s *server) GetByID(ctx context.Context, in *user_grpc.ID) (*user_grpc.User
 func (s *server) Update(ctx context.Context, in *user_grpc.UpdateReq) (*user_grpc.User, error) {
 	userID := ctx.Value("userID").(int64)
 	user := &models.User{
-		ID: userID
+		ID:       userID,
 		Name:     in.Name,
 		Email:    in.Email,
 		Password: in.Password,
@@ -101,9 +100,8 @@ func (s *server) Update(ctx context.Context, in *user_grpc.UpdateReq) (*user_grp
 	return userRPC, nil
 }
 
-func (s *server) Delete(ctx context.Context, in *empty.Empty) (*user_grpc.DeleteRes, error) {
-	userID := ctx.Value("userID").(int64)
-	if err := s.UUsecase.Delete(ctx, userID); err != nil {
+func (s *server) Delete(ctx context.Context, in *user_grpc.ID) (*user_grpc.DeleteRes, error) {
+	if err := s.UUsecase.Delete(ctx, in.Id); err != nil {
 		return nil, err
 	}
 	return &user_grpc.DeleteRes{
@@ -111,9 +109,8 @@ func (s *server) Delete(ctx context.Context, in *empty.Empty) (*user_grpc.Delete
 	}, nil
 }
 
-func (s *server) RefreshIDToken(ctx context.Context, in *empty.Empty) (*user_grpc.TokenPair, error) {
-	userID := ctx.Value("userID").(int64)
-	tokenPair, err := s.UUsecase.RefreshIDToken(ctx, userID)
+func (s *server) RefreshIDToken(ctx context.Context, in *user_grpc.RefreshToken) (*user_grpc.TokenPair, error) {
+	tokenPair, err := s.UUsecase.RefreshIDToken(ctx, in.RefreshToken)
 	if err != nil {
 		return nil, err
 	}

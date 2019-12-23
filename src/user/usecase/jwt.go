@@ -9,7 +9,7 @@ import (
 	"github.com/ezio1119/fishapp-user/models"
 )
 
-func (*userUsecase) GenerateTokenPair(id int64) (*models.TokenPair, error) {
+func (*userUsecase) generateTokenPair(id int64) (*models.TokenPair, error) {
 	jwtkey := []byte(conf.C.Auth.Jwtkey)
 	expSec := conf.C.Auth.TokenExpSec
 	rtExpSec := conf.C.Auth.RtExpSec
@@ -43,4 +43,20 @@ func (*userUsecase) GenerateTokenPair(id int64) (*models.TokenPair, error) {
 		IDToken:      tString,
 		RefreshToken: rtString,
 	}, nil
+}
+
+func (*userUsecase) validateToken(t string) (int64, error) {
+	jwtkey := []byte(conf.C.Auth.Jwtkey)
+	var claims jwt.StandardClaims
+	_, err := jwt.ParseWithClaims(t, &claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtkey, nil
+	})
+	if err != nil {
+		return 0, err
+	}
+	userID, err := strconv.ParseInt(claims.Subject, 10, 64)
+	if err != nil {
+		return 0, err
+	}
+	return userID, nil
 }
