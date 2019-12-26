@@ -9,9 +9,11 @@ services:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: user_DB
       TZ: Asia/Tokyo
-    # ports:
-    #   - "4306:3306"
-  user:
+    ports:
+      - "4306:3306"
+    networks:
+      - api-gateway_default
+  auth:
     build:
       context: .
       dockerfile: Dockerfile.fresh
@@ -22,11 +24,18 @@ services:
     tty: true
     environment:
       TZ: Asia/Tokyo
+    networks:
+      - api-gateway_default
   
   grpcurl:
     image: networld/grpcurl
-    command: /grpcurl -plaintext -d '{"name":"csacss", "email":"asxssscsac@csa.cs", "password":"cdscsacsa"}' -H "Authorization:Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzc2MDEwNjksImlzcyI6InJlZnJlc2hUb2tlbiIsInN1YiI6IjI2In0.M_qe0xcjP7Oor1j450sAeOQ4-fcj2knV2shTbrdZCKQ" user:50051 user_grpc.UserService/Update
+    command: /grpcurl -plaintext -d '{"id":3}' auth:50051 user_grpc.UserService/Delete
     tty: true
+    networks:
+      - api-gateway_default
 volumes:
   user-data:
     driver: local
+networks:
+  api-gateway_default:
+    external: true

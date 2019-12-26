@@ -3,14 +3,18 @@ db:
   name: user_DB
   user: root
   pass: password
+  protocol: tcp
   host: user-db
   port: 3306
-  conn_opt: charset=utf8mb4&parseTime=True&loc=Local
+  parsetime: true
+  allowNativePasswords: true
+  
 sv:
   timeout: 2
   port: 50051
   debug: true
 auth:
-  jwtkey: jwtkey
+  pvt_jwtkey:
+  pub_jwtkey:
   idtoken_exp_sec: 3600
   rt_exp_sec: 864000

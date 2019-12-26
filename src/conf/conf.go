@@ -12,13 +12,15 @@ import (
 
 type config struct {
 	Db struct {
-		Dbms    string
-		Name    string
-		User    string
-		Pass    string
-		Host    string
-		Port    string
-		ConnOpt string `mapstructure:"conn_opt"`
+		Dbms                 string
+		Name                 string
+		User                 string
+		Pass                 string
+		Protocol             string
+		Host                 string
+		Port                 string
+		Parsetime            bool
+		AllowNativePasswords bool
 	}
 	Sv struct {
 		Timeout int64
@@ -26,15 +28,16 @@ type config struct {
 		Debug   bool
 	}
 	Auth struct {
-		Jwtkey      string
-		TokenExpSec int64 `mapstructure:"idtoken_exp_sec"`
-		RtExpSec    int64 `mapstructure:"rt_exp_sec"`
+		PvtJwtkey     string `mapstructure:"pvt_jwtkey"`
+		PubJwtkey     string `mapstructure:"pub_jwtkey"`
+		IDTokenExpSec int64  `mapstructure:"idtoken_exp_sec"`
+		RtExpSec      int64  `mapstructure:"rt_exp_sec"`
 	}
 }
 
 var C config
 
-func Readconf() {
+func init() {
 
 	viper.SetConfigName("conf")
 	viper.SetConfigType("yml")
