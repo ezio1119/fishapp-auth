@@ -3,14 +3,14 @@ package middleware
 import (
 	"time"
 
-	"github.com/ezio1119/fishapp-user/conf"
+	"github.com/ezio1119/fishapp-auth/conf"
 	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 )
 
-func (m *GoMiddleware) LoggerInterceptor() grpc.UnaryServerInterceptor {
+func (m *middleware) LoggerInterceptor() grpc.UnaryServerInterceptor {
 	opts := []grpc_zap.Option{
 		grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
 			return zap.Int64("grpc.time_ns", duration.Nanoseconds())

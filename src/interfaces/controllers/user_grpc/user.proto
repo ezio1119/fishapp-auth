@@ -2,14 +2,14 @@ syntax = "proto3";
 package user_grpc;
 import "validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 
 service UserService {
   rpc Create(CreateReq) returns (UserWithToken);
   rpc GetByID(ID) returns (User);
   rpc Update(UpdateReq) returns (User);
-  rpc Delete(ID) returns (DeleteRes);
-  rpc RefreshIDToken(RefreshToken) returns (TokenPair);
+  rpc Delete(ID) returns (google.protobuf.BoolValue);
   rpc Login(LoginReq) returns (UserWithToken);
 }
 
@@ -39,10 +39,6 @@ message LoginReq {
   string password = 2 [(validate.rules).string.pattern = "^[A-Za-z0-9]{6,72}$"]; // 6文字以上72文字以下の英数字
 }
 
-message DeleteRes {
-  bool deleted = 1;
-}
-
 message ID {
   int64 id = 1 [(validate.rules).int64.gte = 1];
 }
@@ -50,10 +46,6 @@ message ID {
 message UserWithToken {
   User user = 1;
   TokenPair tokenPair = 2;
-}
-
-message RefreshToken {
-  string refreshToken = 1;
 }
 
 message TokenPair{

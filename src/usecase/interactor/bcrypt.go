@@ -1,10 +1,10 @@
-package usecase
+package interactor
 
 import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-func (*userUsecase) genEncryptedPass(pass string) (string, error) {
+func genEncryptedPass(pass string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pass), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
@@ -12,7 +12,7 @@ func (*userUsecase) genEncryptedPass(pass string) (string, error) {
 	return string(hash), nil
 }
 
-func (*userUsecase) compareHashAndPass(encryptedPass string, pass string) error {
+func compareHashAndPass(encryptedPass string, pass string) error {
 	if err := bcrypt.CompareHashAndPassword([]byte(encryptedPass), []byte(pass)); err != nil {
 		return err
 	}
