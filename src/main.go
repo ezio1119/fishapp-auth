@@ -19,8 +19,10 @@ func main() {
 		}
 	}()
 	t := time.Duration(conf.C.Sv.Timeout) * time.Second
+	redisClient := infrastructure.NewRedisClient()
+	authController := registry.NewAuthController(t, redisClient)
 	userController := registry.NewUserController(t, dbConn)
-	server := infrastructure.NewGrpcServer(userController)
+	server := infrastructure.NewGrpcServer(userController, authController)
 	list, err := net.Listen("tcp", ":"+conf.C.Sv.Port)
 	if err != nil {
 		log.Fatal(err)

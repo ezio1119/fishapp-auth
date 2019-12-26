@@ -1,0 +1,15 @@
+syntax = "proto3";
+package auth_grpc;
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+
+service AuthService {
+  rpc RefreshIDToken(google.protobuf.Empty) returns (TokenPair);
+  rpc CheckBlackList(google.protobuf.Empty) returns (google.protobuf.BoolValue); //falseの場合ブラックリストに載っている
+  rpc AddBlackList(google.protobuf.Empty) returns (google.protobuf.BoolValue);
+}
+
+message TokenPair{
+  string idToken = 1;
+  string refreshToken = 2;
+}
