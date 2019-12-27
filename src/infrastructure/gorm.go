@@ -12,7 +12,7 @@ func NewGormConn() *gorm.DB {
 	mysqlConf := &mysql.Config{
 		User:                 conf.C.Db.User,
 		Passwd:               conf.C.Db.Pass,
-		Net:                  conf.C.Db.Protocol,
+		Net:                  conf.C.Db.Net,
 		Addr:                 conf.C.Db.Host + ":" + conf.C.Db.Port,
 		DBName:               conf.C.Db.Name,
 		ParseTime:            conf.C.Db.Parsetime,

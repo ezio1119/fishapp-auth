@@ -16,9 +16,21 @@ type AuthController struct {
 func (c *AuthController) RefreshIDToken(context.Context, *empty.Empty) (*auth_grpc.TokenPair, error) {
 	panic("not implement")
 }
+
 func (c *AuthController) CheckBlackList(context.Context, *empty.Empty) (*wrappers.BoolValue, error) {
-	panic("not implement")
+	token := "csasacsccvhvghvghv"
+	result, err := c.AuthInteractor.CheckBlackList(token)
+	if err != nil {
+		return nil, err
+	}
+	return &wrappers.BoolValue{Value: result}, nil
+	// panic("not implement")
 }
+
 func (c *AuthController) AddBlackList(context.Context, *empty.Empty) (*wrappers.BoolValue, error) {
-	panic("not implement")
+	token := "csasacsccvhvghvghv"
+	if err := c.AuthInteractor.AddBlackList(token); err != nil {
+		return nil, err
+	}
+	return &wrappers.BoolValue{Value: true}, nil
 }
