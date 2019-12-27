@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
-func (m *middleware) LoggerInterceptor() grpc.UnaryServerInterceptor {
+func (m *Middleware) LoggerInterceptor() grpc.UnaryServerInterceptor {
 	opts := []grpc_zap.Option{
 		grpc_zap.WithDurationField(func(duration time.Duration) zapcore.Field {
 			return zap.Int64("grpc.time_ns", duration.Nanoseconds())

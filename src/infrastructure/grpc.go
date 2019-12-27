@@ -10,16 +10,15 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func NewGrpcServer(c *controllers.UserController) *grpc.Server {
-	middle := middleware.InitMiddleware()
+func NewGrpcServer(middLe *middleware.Middleware, uc *controllers.UserController) *grpc.Server {
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-			middle.LoggerInterceptor(),
+			middLe.LoggerInterceptor(),
 			grpc_validator.UnaryServerInterceptor(),
-			middle.RecoveryInterceptor(),
+			middLe.RecoveryInterceptor(),
 		)),
 	)
-	user_grpc.RegisterUserServiceServer(server, c)
+	user_grpc.RegisterUserServiceServer(server, uc)
 	reflection.Register(server)
 	return server
 }

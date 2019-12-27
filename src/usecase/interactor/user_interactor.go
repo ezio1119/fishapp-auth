@@ -6,12 +6,15 @@ import (
 
 	"github.com/ezio1119/fishapp-auth/domain"
 	"github.com/ezio1119/fishapp-auth/usecase/repository"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type UserInteractor struct {
-	UserRepository  repository.UserRepository
-	TokenInteractor UTokenInteractor
-	ContextTimeout  time.Duration
+	UserRepository      repository.UserRepository
+	BlackListRepository repository.BlackListRepository
+	TokenInteractor     UTokenInteractor
+	ContextTimeout      time.Duration
 }
 
 type UUserInteractor interface {
@@ -20,6 +23,8 @@ type UUserInteractor interface {
 	Create(ctx context.Context, u *domain.User) (*domain.TokenPair, error)
 	Delete(ctx context.Context, id int64) error
 	Login(ctx context.Context, email string, pass string) (*domain.User, *domain.TokenPair, error)
+	Logout(ctx context.Context, jti string) error
+	RefreshIDToken(ctx context.Context, userID int64, jti string) (*domain.TokenPair, error)
 }
 
 func (i *UserInteractor) GetByID(ctx context.Context, id int64) (*domain.User, error) {
@@ -90,4 +95,23 @@ func (i *UserInteractor) Login(ctx context.Context, email string, pass string) (
 	}
 
 	return user, tokenPair, nil
+}
+
+func (i *UserInteractor) Logout(ctx context.Context, jti string) error {
+	ctx, cancel := context.WithTimeout(ctx, i.ContextTimeout)
+	defer cancel()
+	return i.BlackListRepository.SAdd(jti)
+}
+
+func (i *UserInteractor) RefreshIDToken(ctx context.Context, userID int64, jti string) (*domain.TokenPair, error) {
+	ctx, cancel := context.WithTimeout(ctx, i.ContextTimeout)
+	defer cancel()
+	blackListed, err := i.BlackListRepository.SIsMember(jti)
+	if err != nil {
+		return nil, err
+	}
+	if blackListed {
+		return nil, status.Error(codes.Unauthenticated, "Token is blacklisted")
+	}
+	return i.TokenInteractor.GenerateTokenPair(userID)
 }

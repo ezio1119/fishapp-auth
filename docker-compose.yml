@@ -26,15 +26,31 @@ services:
       TZ: Asia/Tokyo
     networks:
       - api-gateway_default
-  
-  grpcurl:
-    image: networld/grpcurl
-    command: /grpcurl -plaintext -d '{"id":3}' auth:50051 user_grpc.UserService/Delete
+  blacklist-kvs:
+    image: redis:rc-alpine3.11
     tty: true
+    volumes:
+      - auth-data:/data
+    command: ["--requirepass", "password"]
+    ports:
+      - "6379:6379"
+    networks:
+      - api-gateway_default
+  # grpcurl:
+  #   image: networld/grpcurl
+  #   command: /grpcurl -plaintext  auth:50051 auth_grpc.AuthService/AddBlackList
+  #   tty: true
+  #   networks:
+  #     - api-gateway_default
+  grpc-cli:
+    image: namely/grpc-cli
+    command: call auth:50051 Logout "jti:'bcc2db9e-d60f-46d7-a6e5-00aff9a2ba4a'"
     networks:
       - api-gateway_default
 volumes:
   user-data:
+    driver: local
+  auth-data:
     driver: local
 networks:
   api-gateway_default:

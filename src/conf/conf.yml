@@ -3,16 +3,21 @@ db:
   name: user_DB
   user: root
   pass: password
-  protocol: tcp
+  net: tcp
   host: user-db
   port: 3306
   parsetime: true
   allowNativePasswords: true
-  
 sv:
   timeout: 2
   port: 50051
   debug: true
+kvs:
+  db: 0
+  pass: password
+  host: blacklist-kvs
+  port: 6379
+  net: tcp
 auth:
   pvt_jwtkey:
   pub_jwtkey:

@@ -16,7 +16,7 @@ type config struct {
 		Name                 string
 		User                 string
 		Pass                 string
-		Protocol             string
+		Net                  string
 		Host                 string
 		Port                 string
 		Parsetime            bool
@@ -26,6 +26,13 @@ type config struct {
 		Timeout int64
 		Port    string
 		Debug   bool
+	}
+	Kvs struct {
+		Db   int
+		Pass string
+		Host string
+		Port string
+		Net  string
 	}
 	Auth struct {
 		PvtJwtkey     string `mapstructure:"pvt_jwtkey"`
