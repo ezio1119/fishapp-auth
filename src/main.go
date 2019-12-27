@@ -7,6 +7,7 @@ import (
 
 	"github.com/ezio1119/fishapp-auth/conf"
 	"github.com/ezio1119/fishapp-auth/infrastructure"
+	"github.com/ezio1119/fishapp-auth/infrastructure/middleware"
 	"github.com/ezio1119/fishapp-auth/registry"
 )
 
@@ -20,9 +21,10 @@ func main() {
 	}()
 	t := time.Duration(conf.C.Sv.Timeout) * time.Second
 	redisClient := infrastructure.NewRedisClient()
-	authController := registry.NewAuthController(t, redisClient)
-	userController := registry.NewUserController(t, dbConn)
-	server := infrastructure.NewGrpcServer(userController, authController)
+	userController := registry.NewUserController(t, dbConn, redisClient)
+
+	middLe := middleware.InitMiddleware()
+	server := infrastructure.NewGrpcServer(middLe, userController)
 	list, err := net.Listen("tcp", ":"+conf.C.Sv.Port)
 	if err != nil {
 		log.Fatal(err)

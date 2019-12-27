@@ -2,6 +2,7 @@ package infrastructure
 
 import (
 	"log"
+	"time"
 
 	"github.com/ezio1119/fishapp-auth/conf"
 	"github.com/go-sql-driver/mysql"
@@ -16,6 +17,7 @@ func NewGormConn() *gorm.DB {
 		Addr:                 conf.C.Db.Host + ":" + conf.C.Db.Port,
 		DBName:               conf.C.Db.Name,
 		ParseTime:            conf.C.Db.Parsetime,
+		Loc:                  time.Now().Location(),
 		AllowNativePasswords: conf.C.Db.AllowNativePasswords,
 	}
 

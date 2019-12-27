@@ -10,22 +10,13 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func NewUserController(t time.Duration, conn *gorm.DB) *controllers.UserController {
+func NewUserController(t time.Duration, conn *gorm.DB, client *redis.Client) *controllers.UserController {
 	return &controllers.UserController{
 		UserInteractor: &interactor.UserInteractor{
 			UserRepository: &repository.UserRepository{
 				Conn: conn,
 			},
-			TokenInteractor: &interactor.TokenInteractor{},
-			ContextTimeout:  t,
-		},
-	}
-}
-
-func NewAuthController(t time.Duration, client *redis.Client) *controllers.AuthController {
-	return &controllers.AuthController{
-		AuthInteractor: &interactor.AuthInteractor{
-			AuthRepository: &repository.AuthRepository{
+			BlackListRepository: &repository.BlackListRepository{
 				Client: client,
 			},
 			TokenInteractor: &interactor.TokenInteractor{},

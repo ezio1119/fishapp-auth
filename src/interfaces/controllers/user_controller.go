@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ezio1119/fishapp-auth/domain"
 	"github.com/ezio1119/fishapp-auth/interfaces/controllers/user_grpc"
@@ -12,6 +13,20 @@ import (
 
 type UserController struct {
 	UserInteractor interactor.UUserInteractor
+}
+
+type contextKey string
+
+const UserIDCtxKey contextKey = "userID"
+
+func getUserIDCtx(ctx context.Context) (int64, error) {
+	v := ctx.Value(UserIDCtxKey)
+	userID, ok := v.(int64)
+	if !ok {
+		return 0, fmt.Errorf("userID not found")
+	}
+
+	return userID, nil
 }
 
 func (c *UserController) transformUserRPC(u *domain.User) (*user_grpc.User, error) {
@@ -109,4 +124,21 @@ func (c *UserController) Login(ctx context.Context, in *user_grpc.LoginReq) (*us
 		User:      userRPC,
 		TokenPair: tokenPairRPC,
 	}, nil
+}
+
+func (c *UserController) Logout(ctx context.Context, req *user_grpc.LogoutReq) (*wrappers.BoolValue, error) {
+	if err := c.UserInteractor.Logout(ctx, req.Jti); err != nil {
+		return nil, err
+	}
+	return &wrappers.BoolValue{
+		Value: true,
+	}, nil
+}
+
+func (c *UserController) RefreshIDToken(ctx context.Context, req *user_grpc.RefreshReq) (*user_grpc.TokenPair, error) {
+	tokenPair, err := c.UserInteractor.RefreshIDToken(ctx, req.Id, req.Jti)
+	if err != nil {
+		return nil, err
+	}
+	return c.transformTokenPairRPC(tokenPair), nil
 }

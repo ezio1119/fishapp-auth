@@ -6,11 +6,11 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type AuthRepository struct {
+type BlackListRepository struct {
 	Client *redis.Client
 }
 
-func (r *AuthRepository) SAdd(token string) error {
+func (r *BlackListRepository) SAdd(token string) error {
 	result, err := r.Client.SAdd("token", token).Result()
 	if err != nil {
 		return err
@@ -21,6 +21,6 @@ func (r *AuthRepository) SAdd(token string) error {
 	return nil
 }
 
-func (r *AuthRepository) SIsMember(t string) (bool, error) {
+func (r *BlackListRepository) SIsMember(t string) (bool, error) {
 	return r.Client.SIsMember("token", t).Result()
 }

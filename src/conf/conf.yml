@@ -15,7 +15,7 @@ sv:
 kvs:
   db: 0
   pass: password
-  host: auth-kvs
+  host: blacklist-kvs
   port: 6379
   net: tcp
 auth:
