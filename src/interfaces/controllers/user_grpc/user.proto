@@ -2,6 +2,7 @@ syntax = "proto3";
 package user_grpc;
 import "validate/validate.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
 import "google/protobuf/wrappers.proto";
 
 
@@ -11,8 +12,8 @@ service UserService {
   rpc Update(UpdateReq) returns (User);
   rpc Delete(ID) returns (google.protobuf.BoolValue);
   rpc Login(LoginReq) returns (UserWithToken);
-  rpc Logout(LogoutReq) returns (google.protobuf.BoolValue);
-  rpc RefreshIDToken(RefreshReq) returns (TokenPair);
+  rpc AddBlackList(AddBlackListReq) returns (google.protobuf.BoolValue);
+  rpc CheckBlackListAndGenToken(CheckBlackListReq) returns (TokenPair);
 }
 
 message User {
@@ -41,11 +42,12 @@ message LoginReq {
   string password = 2 [(validate.rules).string.pattern = "^[A-Za-z0-9]{6,72}$"]; // 6文字以上72文字以下の英数字
 }
 
-message LogoutReq {
+message AddBlackListReq {
   string jti = 1 [(validate.rules).string.uuid = true];
+  google.protobuf.Duration expiration = 2 [(validate.rules).duration.required = true];
 }
 
-message RefreshReq {
+message CheckBlackListReq {
   int64 id = 1 [(validate.rules).int64.gte = 1];
   string jti = 2 [(validate.rules).string.uuid = true];
 }

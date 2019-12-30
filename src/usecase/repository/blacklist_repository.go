@@ -1,6 +1,10 @@
 package repository
 
+import (
+	"time"
+)
+
 type BlackListRepository interface {
-	SAdd(jti string) error
-	SIsMember(jti string) (bool, error)
+	SetNX(jti string, exp time.Duration) (bool, error)
+	Exists(t string) (int64, error)
 }
