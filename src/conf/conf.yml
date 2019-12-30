@@ -20,6 +20,5 @@ kvs:
   net: tcp
 auth:
   pvt_jwtkey:
-  pub_jwtkey:
   idtoken_exp_sec: 3600
   rt_exp_sec: 864000

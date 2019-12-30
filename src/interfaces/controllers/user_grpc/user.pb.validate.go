@@ -540,25 +540,33 @@ var _ interface {
 
 var _LoginReq_Password_Pattern = regexp.MustCompile("^[A-Za-z0-9]{6,72}$")
 
-// Validate checks the field values on LogoutReq with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *LogoutReq) Validate() error {
+// Validate checks the field values on AddBlackListReq with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *AddBlackListReq) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if err := m._validateUuid(m.GetJti()); err != nil {
-		return LogoutReqValidationError{
+		return AddBlackListReqValidationError{
 			field:  "Jti",
 			reason: "value must be a valid UUID",
 			cause:  err,
 		}
 	}
 
+	if m.GetExpiration() == nil {
+		return AddBlackListReqValidationError{
+			field:  "Expiration",
+			reason: "value is required",
+		}
+	}
+
 	return nil
 }
 
-func (m *LogoutReq) _validateUuid(uuid string) error {
+func (m *AddBlackListReq) _validateUuid(uuid string) error {
 	if matched := _user_uuidPattern.MatchString(uuid); !matched {
 		return errors.New("invalid uuid format")
 	}
@@ -566,9 +574,9 @@ func (m *LogoutReq) _validateUuid(uuid string) error {
 	return nil
 }
 
-// LogoutReqValidationError is the validation error returned by
-// LogoutReq.Validate if the designated constraints aren't met.
-type LogoutReqValidationError struct {
+// AddBlackListReqValidationError is the validation error returned by
+// AddBlackListReq.Validate if the designated constraints aren't met.
+type AddBlackListReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -576,22 +584,22 @@ type LogoutReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e LogoutReqValidationError) Field() string { return e.field }
+func (e AddBlackListReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e LogoutReqValidationError) Reason() string { return e.reason }
+func (e AddBlackListReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e LogoutReqValidationError) Cause() error { return e.cause }
+func (e AddBlackListReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e LogoutReqValidationError) Key() bool { return e.key }
+func (e AddBlackListReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e LogoutReqValidationError) ErrorName() string { return "LogoutReqValidationError" }
+func (e AddBlackListReqValidationError) ErrorName() string { return "AddBlackListReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e LogoutReqValidationError) Error() string {
+func (e AddBlackListReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -603,14 +611,14 @@ func (e LogoutReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sLogoutReq.%s: %s%s",
+		"invalid %sAddBlackListReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = LogoutReqValidationError{}
+var _ error = AddBlackListReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -618,24 +626,25 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = LogoutReqValidationError{}
+} = AddBlackListReqValidationError{}
 
-// Validate checks the field values on RefreshReq with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *RefreshReq) Validate() error {
+// Validate checks the field values on CheckBlackListReq with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *CheckBlackListReq) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if m.GetId() < 1 {
-		return RefreshReqValidationError{
+		return CheckBlackListReqValidationError{
 			field:  "Id",
 			reason: "value must be greater than or equal to 1",
 		}
 	}
 
 	if err := m._validateUuid(m.GetJti()); err != nil {
-		return RefreshReqValidationError{
+		return CheckBlackListReqValidationError{
 			field:  "Jti",
 			reason: "value must be a valid UUID",
 			cause:  err,
@@ -645,7 +654,7 @@ func (m *RefreshReq) Validate() error {
 	return nil
 }
 
-func (m *RefreshReq) _validateUuid(uuid string) error {
+func (m *CheckBlackListReq) _validateUuid(uuid string) error {
 	if matched := _user_uuidPattern.MatchString(uuid); !matched {
 		return errors.New("invalid uuid format")
 	}
@@ -653,9 +662,9 @@ func (m *RefreshReq) _validateUuid(uuid string) error {
 	return nil
 }
 
-// RefreshReqValidationError is the validation error returned by
-// RefreshReq.Validate if the designated constraints aren't met.
-type RefreshReqValidationError struct {
+// CheckBlackListReqValidationError is the validation error returned by
+// CheckBlackListReq.Validate if the designated constraints aren't met.
+type CheckBlackListReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -663,22 +672,24 @@ type RefreshReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e RefreshReqValidationError) Field() string { return e.field }
+func (e CheckBlackListReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e RefreshReqValidationError) Reason() string { return e.reason }
+func (e CheckBlackListReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e RefreshReqValidationError) Cause() error { return e.cause }
+func (e CheckBlackListReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e RefreshReqValidationError) Key() bool { return e.key }
+func (e CheckBlackListReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e RefreshReqValidationError) ErrorName() string { return "RefreshReqValidationError" }
+func (e CheckBlackListReqValidationError) ErrorName() string {
+	return "CheckBlackListReqValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e RefreshReqValidationError) Error() string {
+func (e CheckBlackListReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -690,14 +701,14 @@ func (e RefreshReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sRefreshReq.%s: %s%s",
+		"invalid %sCheckBlackListReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = RefreshReqValidationError{}
+var _ error = CheckBlackListReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -705,7 +716,7 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = RefreshReqValidationError{}
+} = CheckBlackListReqValidationError{}
 
 // Validate checks the field values on ID with the rules defined in the proto
 // definition for this message. If any rules are violated, an error is returned.

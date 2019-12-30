@@ -36,7 +36,6 @@ type config struct {
 	}
 	Auth struct {
 		PvtJwtkey     string `mapstructure:"pvt_jwtkey"`
-		PubJwtkey     string `mapstructure:"pub_jwtkey"`
 		IDTokenExpSec int64  `mapstructure:"idtoken_exp_sec"`
 		RtExpSec      int64  `mapstructure:"rt_exp_sec"`
 	}

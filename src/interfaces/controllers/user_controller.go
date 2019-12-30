@@ -126,17 +126,22 @@ func (c *UserController) Login(ctx context.Context, in *user_grpc.LoginReq) (*us
 	}, nil
 }
 
-func (c *UserController) Logout(ctx context.Context, req *user_grpc.LogoutReq) (*wrappers.BoolValue, error) {
-	if err := c.UserInteractor.Logout(ctx, req.Jti); err != nil {
+func (c *UserController) AddBlackList(ctx context.Context, in *user_grpc.AddBlackListReq) (*wrappers.BoolValue, error) {
+	exp, err := ptypes.Duration(in.Expiration)
+	if err != nil {
+		return nil, err
+	}
+	success, err := c.UserInteractor.AddBlackList(ctx, in.Jti, exp)
+	if err != nil {
 		return nil, err
 	}
 	return &wrappers.BoolValue{
-		Value: true,
+		Value: success,
 	}, nil
 }
 
-func (c *UserController) RefreshIDToken(ctx context.Context, req *user_grpc.RefreshReq) (*user_grpc.TokenPair, error) {
-	tokenPair, err := c.UserInteractor.RefreshIDToken(ctx, req.Id, req.Jti)
+func (c *UserController) CheckBlackListAndGenToken(ctx context.Context, in *user_grpc.CheckBlackListReq) (*user_grpc.TokenPair, error) {
+	tokenPair, err := c.UserInteractor.CheckBlackListAndGenToken(ctx, in.Id, in.Jti)
 	if err != nil {
 		return nil, err
 	}

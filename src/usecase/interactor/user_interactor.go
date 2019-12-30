@@ -23,8 +23,8 @@ type UUserInteractor interface {
 	Create(ctx context.Context, u *domain.User) (*domain.TokenPair, error)
 	Delete(ctx context.Context, id int64) error
 	Login(ctx context.Context, email string, pass string) (*domain.User, *domain.TokenPair, error)
-	Logout(ctx context.Context, jti string) error
-	RefreshIDToken(ctx context.Context, userID int64, jti string) (*domain.TokenPair, error)
+	AddBlackList(ctx context.Context, jti string, exp time.Duration) (bool, error)
+	CheckBlackListAndGenToken(ctx context.Context, userID int64, jti string) (*domain.TokenPair, error)
 }
 
 func (i *UserInteractor) GetByID(ctx context.Context, id int64) (*domain.User, error) {
@@ -97,20 +97,20 @@ func (i *UserInteractor) Login(ctx context.Context, email string, pass string) (
 	return user, tokenPair, nil
 }
 
-func (i *UserInteractor) Logout(ctx context.Context, jti string) error {
+func (i *UserInteractor) AddBlackList(ctx context.Context, jti string, exp time.Duration) (bool, error) {
 	ctx, cancel := context.WithTimeout(ctx, i.ContextTimeout)
 	defer cancel()
-	return i.BlackListRepository.SAdd(jti)
+	return i.BlackListRepository.SetNX(jti, exp)
 }
 
-func (i *UserInteractor) RefreshIDToken(ctx context.Context, userID int64, jti string) (*domain.TokenPair, error) {
+func (i *UserInteractor) CheckBlackListAndGenToken(ctx context.Context, userID int64, jti string) (*domain.TokenPair, error) {
 	ctx, cancel := context.WithTimeout(ctx, i.ContextTimeout)
 	defer cancel()
-	blackListed, err := i.BlackListRepository.SIsMember(jti)
+	blackListed, err := i.BlackListRepository.Exists(jti)
 	if err != nil {
 		return nil, err
 	}
-	if blackListed {
+	if blackListed == 1 {
 		return nil, status.Error(codes.Unauthenticated, "Token is blacklisted")
 	}
 	return i.TokenInteractor.GenerateTokenPair(userID)
