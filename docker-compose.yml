@@ -1,39 +1,29 @@
 version: '3'
 services:
-  user-db:
+  profile-db:
     image: mysql:8.0.17
     volumes:
-      - user-data:/var/lib/mysql
+      - profile-data:/var/lib/mysql
     command: --default-authentication-plugin=mysql_native_password
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: user_DB
+      MYSQL_DATABASE: profile_DB
       TZ: Asia/Tokyo
     ports:
       - "4306:3306"
     networks:
       - api-gateway_default
-  auth:
+  profile:
     build:
       context: .
       dockerfile: Dockerfile.fresh
     volumes:
       - ./src/.:/app
     depends_on:
-      - user-db
+      - profile-db
     tty: true
     environment:
       TZ: Asia/Tokyo
-    networks:
-      - api-gateway_default
-  blacklist-kvs:
-    image: redis:rc-alpine3.11
-    tty: true
-    volumes:
-      - auth-data:/data
-    command: ["--requirepass", "password"]
-    ports:
-      - "6379:6379"
     networks:
       - api-gateway_default
   # grpcurl:
@@ -44,13 +34,11 @@ services:
   #     - api-gateway_default
   grpc-cli:
     image: namely/grpc-cli
-    command: call auth:50051 Logout "jti:'bcc2db9e-d60f-46d7-a6e5-00aff9a2ba4a'"
+    command: call profile:50051 Delete "user_id:3"
     networks:
       - api-gateway_default
 volumes:
-  user-data:
-    driver: local
-  auth-data:
+  profile-data:
     driver: local
 networks:
   api-gateway_default:
