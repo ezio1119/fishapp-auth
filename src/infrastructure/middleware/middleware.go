@@ -1,7 +1,17 @@
 package middleware
 
-type Middleware struct{}
+import (
+	"google.golang.org/grpc"
+)
 
-func InitMiddleware() *Middleware {
-	return &Middleware{}
+type middleware struct{}
+
+type Middleware interface {
+	RecoveryInterceptor() grpc.UnaryServerInterceptor
+	LoggerInterceptor() grpc.UnaryServerInterceptor
+	ValidatorInterceptor() grpc.UnaryServerInterceptor
+}
+
+func InitMiddleware() Middleware {
+	return &middleware{}
 }

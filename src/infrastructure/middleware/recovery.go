@@ -6,7 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 )
 
-func (m *Middleware) RecoveryInterceptor() grpc.UnaryServerInterceptor {
+func (m *middleware) RecoveryInterceptor() grpc.UnaryServerInterceptor {
 	customFunc := func(p interface{}) (err error) {
 		return grpc.Errorf(codes.Unknown, "panic triggered: %v", p)
 	}

@@ -27,18 +27,6 @@ type config struct {
 		Port    string
 		Debug   bool
 	}
-	Kvs struct {
-		Db   int
-		Pass string
-		Host string
-		Port string
-		Net  string
-	}
-	Auth struct {
-		PvtJwtkey     string `mapstructure:"pvt_jwtkey"`
-		IDTokenExpSec int64  `mapstructure:"idtoken_exp_sec"`
-		RtExpSec      int64  `mapstructure:"rt_exp_sec"`
-	}
 }
 
 var C config

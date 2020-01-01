@@ -4,7 +4,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/ezio1119/fishapp-auth/conf"
+	"github.com/ezio1119/fishapp-profile/conf"
 	"github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 )
