@@ -26,19 +26,19 @@ func (c *profileController) Create(ctx context.Context, in *profile_grpc.CreateR
 }
 
 func (c *profileController) GetByUserID(ctx context.Context, in *profile_grpc.ID) (*profile_grpc.Profile, error) {
-	return c.profileInteractor.GetByID(ctx, in.UserId)
+	return c.profileInteractor.GetByUserID(ctx, in.UserId)
 }
 
-func (c *profileController) Update(ctx context.Context, in *profile_grpc.UpdateReq) (*profile_grpc.Profile, error) {
+func (c *profileController) UpdateByUserID(ctx context.Context, in *profile_grpc.UpdateReq) (*profile_grpc.Profile, error) {
 	profile := &domain.Profile{
 		Name:   in.Name,
 		UserID: in.UserId,
 	}
-	return c.profileInteractor.Update(ctx, profile)
+	return c.profileInteractor.UpdateByUserID(ctx, profile)
 }
 
-func (c *profileController) Delete(ctx context.Context, in *profile_grpc.ID) (*wrappers.BoolValue, error) {
-	if err := c.profileInteractor.Delete(ctx, in.UserId); err != nil {
+func (c *profileController) DeleteByUserID(ctx context.Context, in *profile_grpc.ID) (*wrappers.BoolValue, error) {
+	if err := c.profileInteractor.DeleteByUserID(ctx, in.UserId); err != nil {
 		return &wrappers.BoolValue{Value: false}, err
 	}
 	return &wrappers.BoolValue{Value: true}, nil

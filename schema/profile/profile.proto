@@ -8,8 +8,8 @@ import "google/protobuf/wrappers.proto";
 service ProfileService {
   rpc Create(CreateReq) returns (Profile);
   rpc GetByUserID(ID) returns (Profile);
-  rpc Update(UpdateReq) returns (Profile);
-  rpc Delete(ID) returns (google.protobuf.BoolValue);
+  rpc UpdateByUserID(UpdateReq) returns (Profile);
+  rpc DeleteByUserID(ID) returns (google.protobuf.BoolValue);
 }
 
 message Profile {

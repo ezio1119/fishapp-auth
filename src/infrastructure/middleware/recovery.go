@@ -8,7 +8,7 @@ import (
 
 func (m *middleware) RecoveryInterceptor() grpc.UnaryServerInterceptor {
 	customFunc := func(p interface{}) (err error) {
-		return grpc.Errorf(codes.Unknown, "panic triggered: %v", p)
+		return grpc.Errorf(codes.Internal, "panic triggered: %v", p)
 	}
 	// Shared options for the logger, with a custom gRPC code to log level function.
 	opts := []grpc_recovery.Option{
