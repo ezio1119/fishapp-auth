@@ -3,13 +3,16 @@ WORKDIR /src
 
 COPY src/go.mod .
 COPY src/go.sum .
-RUN go mod download
+RUN src/go mod download
 
 COPY src .
 RUN go build -o main .
 
 FROM alpine
 WORKDIR /app
-CMD ["./main"]
+RUN apk add --no-cache tzdata
 COPY --from=builder /src/main .
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
 COPY --from=builder /src/conf/conf.yml /app/conf/conf.yml
+
+CMD ["./main"]
