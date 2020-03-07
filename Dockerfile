@@ -3,7 +3,7 @@ WORKDIR /src
 
 COPY src/go.mod .
 COPY src/go.sum .
-RUN go mod downloadd
+RUN go mod download
 
 COPY src .
 RUN go build -o main .
