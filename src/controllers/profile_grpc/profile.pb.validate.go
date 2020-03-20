@@ -47,6 +47,10 @@ func (m *Profile) Validate() error {
 
 	// no validation rules for Name
 
+	// no validation rules for Introduction
+
+	// no validation rules for Sex
+
 	// no validation rules for UserId
 
 	if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
@@ -126,22 +130,109 @@ var _ interface {
 	ErrorName() string
 } = ProfileValidationError{}
 
-// Validate checks the field values on CreateReq with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *CreateReq) Validate() error {
+// Validate checks the field values on GetProfileReq with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *GetProfileReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if m.GetUserId() < 1 {
+		return GetProfileReqValidationError{
+			field:  "UserId",
+			reason: "value must be greater than or equal to 1",
+		}
+	}
+
+	return nil
+}
+
+// GetProfileReqValidationError is the validation error returned by
+// GetProfileReq.Validate if the designated constraints aren't met.
+type GetProfileReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetProfileReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetProfileReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetProfileReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetProfileReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetProfileReqValidationError) ErrorName() string { return "GetProfileReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetProfileReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetProfileReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetProfileReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetProfileReqValidationError{}
+
+// Validate checks the field values on CreateProfileReq with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *CreateProfileReq) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 10 {
-		return CreateReqValidationError{
+		return CreateProfileReqValidationError{
 			field:  "Name",
 			reason: "value length must be between 1 and 10 runes, inclusive",
 		}
 	}
 
+	if l := utf8.RuneCountInString(m.GetIntroduction()); l < 1 || l > 1000 {
+		return CreateProfileReqValidationError{
+			field:  "Introduction",
+			reason: "value length must be between 1 and 1000 runes, inclusive",
+		}
+	}
+
+	if _, ok := Sex_name[int32(m.GetSex())]; !ok {
+		return CreateProfileReqValidationError{
+			field:  "Sex",
+			reason: "value must be one of the defined enum values",
+		}
+	}
+
 	if m.GetUserId() < 1 {
-		return CreateReqValidationError{
+		return CreateProfileReqValidationError{
 			field:  "UserId",
 			reason: "value must be greater than or equal to 1",
 		}
@@ -150,9 +241,9 @@ func (m *CreateReq) Validate() error {
 	return nil
 }
 
-// CreateReqValidationError is the validation error returned by
-// CreateReq.Validate if the designated constraints aren't met.
-type CreateReqValidationError struct {
+// CreateProfileReqValidationError is the validation error returned by
+// CreateProfileReq.Validate if the designated constraints aren't met.
+type CreateProfileReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -160,22 +251,22 @@ type CreateReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e CreateReqValidationError) Field() string { return e.field }
+func (e CreateProfileReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e CreateReqValidationError) Reason() string { return e.reason }
+func (e CreateProfileReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e CreateReqValidationError) Cause() error { return e.cause }
+func (e CreateProfileReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e CreateReqValidationError) Key() bool { return e.key }
+func (e CreateProfileReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e CreateReqValidationError) ErrorName() string { return "CreateReqValidationError" }
+func (e CreateProfileReqValidationError) ErrorName() string { return "CreateProfileReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e CreateReqValidationError) Error() string {
+func (e CreateProfileReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -187,14 +278,14 @@ func (e CreateReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sCreateReq.%s: %s%s",
+		"invalid %sCreateProfileReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = CreateReqValidationError{}
+var _ error = CreateProfileReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -202,24 +293,32 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = CreateReqValidationError{}
+} = CreateProfileReqValidationError{}
 
-// Validate checks the field values on UpdateReq with the rules defined in the
-// proto definition for this message. If any rules are violated, an error is returned.
-func (m *UpdateReq) Validate() error {
+// Validate checks the field values on UpdateProfileReq with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *UpdateProfileReq) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 10 {
-		return UpdateReqValidationError{
+		return UpdateProfileReqValidationError{
 			field:  "Name",
 			reason: "value length must be between 1 and 10 runes, inclusive",
 		}
 	}
 
+	if l := utf8.RuneCountInString(m.GetIntroduction()); l < 1 || l > 1000 {
+		return UpdateProfileReqValidationError{
+			field:  "Introduction",
+			reason: "value length must be between 1 and 1000 runes, inclusive",
+		}
+	}
+
 	if m.GetUserId() < 1 {
-		return UpdateReqValidationError{
+		return UpdateProfileReqValidationError{
 			field:  "UserId",
 			reason: "value must be greater than or equal to 1",
 		}
@@ -228,9 +327,9 @@ func (m *UpdateReq) Validate() error {
 	return nil
 }
 
-// UpdateReqValidationError is the validation error returned by
-// UpdateReq.Validate if the designated constraints aren't met.
-type UpdateReqValidationError struct {
+// UpdateProfileReqValidationError is the validation error returned by
+// UpdateProfileReq.Validate if the designated constraints aren't met.
+type UpdateProfileReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -238,22 +337,22 @@ type UpdateReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e UpdateReqValidationError) Field() string { return e.field }
+func (e UpdateProfileReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UpdateReqValidationError) Reason() string { return e.reason }
+func (e UpdateProfileReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UpdateReqValidationError) Cause() error { return e.cause }
+func (e UpdateProfileReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UpdateReqValidationError) Key() bool { return e.key }
+func (e UpdateProfileReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UpdateReqValidationError) ErrorName() string { return "UpdateReqValidationError" }
+func (e UpdateProfileReqValidationError) ErrorName() string { return "UpdateProfileReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e UpdateReqValidationError) Error() string {
+func (e UpdateProfileReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -265,14 +364,14 @@ func (e UpdateReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUpdateReq.%s: %s%s",
+		"invalid %sUpdateProfileReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UpdateReqValidationError{}
+var _ error = UpdateProfileReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -280,17 +379,18 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UpdateReqValidationError{}
+} = UpdateProfileReqValidationError{}
 
-// Validate checks the field values on ID with the rules defined in the proto
-// definition for this message. If any rules are violated, an error is returned.
-func (m *ID) Validate() error {
+// Validate checks the field values on DeleteProfileReq with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *DeleteProfileReq) Validate() error {
 	if m == nil {
 		return nil
 	}
 
 	if m.GetUserId() < 1 {
-		return IDValidationError{
+		return DeleteProfileReqValidationError{
 			field:  "UserId",
 			reason: "value must be greater than or equal to 1",
 		}
@@ -299,9 +399,9 @@ func (m *ID) Validate() error {
 	return nil
 }
 
-// IDValidationError is the validation error returned by ID.Validate if the
-// designated constraints aren't met.
-type IDValidationError struct {
+// DeleteProfileReqValidationError is the validation error returned by
+// DeleteProfileReq.Validate if the designated constraints aren't met.
+type DeleteProfileReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -309,22 +409,22 @@ type IDValidationError struct {
 }
 
 // Field function returns field value.
-func (e IDValidationError) Field() string { return e.field }
+func (e DeleteProfileReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e IDValidationError) Reason() string { return e.reason }
+func (e DeleteProfileReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e IDValidationError) Cause() error { return e.cause }
+func (e DeleteProfileReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e IDValidationError) Key() bool { return e.key }
+func (e DeleteProfileReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e IDValidationError) ErrorName() string { return "IDValidationError" }
+func (e DeleteProfileReqValidationError) ErrorName() string { return "DeleteProfileReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e IDValidationError) Error() string {
+func (e DeleteProfileReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -336,14 +436,14 @@ func (e IDValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sID.%s: %s%s",
+		"invalid %sDeleteProfileReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = IDValidationError{}
+var _ error = DeleteProfileReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -351,4 +451,4 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = IDValidationError{}
+} = DeleteProfileReqValidationError{}

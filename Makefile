@@ -16,7 +16,11 @@ proto:
 
 cli:
 	docker run --rm --name grpc_cli --net=api-gateway_default namely/grpc-cli \
-	call $(API):50051 $(API)_grpc.ProfileService.$(m) $(q) $(o)
+	call $(API):50051 $(API)_grpc.ProfileService.$(m) "$(q)" $(o)
+
+sqldoc:
+	docker run --rm --net=api-gateway_default -v $(CURRENT_DIR)/db:/work ezio1119/tbls \
+	doc -f -t svg mysql://root:password@${API}-db:3306/${API}_DB ./
 
 migrate:
 	docker run --rm -it --name migrate --net=api-gateway_default \
@@ -39,7 +43,4 @@ exec:
 	$(DC) exec $(API) sh
 
 logs:
-	$(DC) logs -f --tail 100 $(API)
-
-redis:
-	$(DC) exec $(API)-kvs sh
+	docker logs -f --tail 100 $(API)_$(API)_1

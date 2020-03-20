@@ -12,10 +12,10 @@ import (
 
 // Usecase
 type ProfileRepository interface {
-	GetByUserID(ctx context.Context, userID int64) (*domain.Profile, error)
-	UpdateByUserID(ctx context.Context, p *domain.Profile) error
-	Create(ctx context.Context, p *domain.Profile) error
-	DeleteByUserID(ctx context.Context, userID int64) error
+	GetProfileByUserID(ctx context.Context, userID int64) (*domain.Profile, error)
+	UpdateProfile(ctx context.Context, p *domain.Profile) error
+	CreateProfile(ctx context.Context, p *domain.Profile) error
+	DeleteProfile(ctx context.Context, userID int64) error
 }
 
 type profileRepository struct {
@@ -26,9 +26,9 @@ func NewProfileRepository(conn *gorm.DB) ProfileRepository {
 	return &profileRepository{conn}
 }
 
-func (r *profileRepository) GetByUserID(ctx context.Context, uID int64) (*domain.Profile, error) {
+func (r *profileRepository) GetProfileByUserID(ctx context.Context, uID int64) (*domain.Profile, error) {
 	p := &domain.Profile{}
-	if err := r.conn.Where("user_id = ?", uID).First(p).Error; err != nil {
+	if err := r.conn.Where("user_id = ?", uID).Take(p).Error; err != nil {
 		if gorm.IsRecordNotFoundError(err) {
 			err = status.Errorf(codes.NotFound, "profile with user_id='%d' is not found", uID)
 		}
@@ -37,7 +37,7 @@ func (r *profileRepository) GetByUserID(ctx context.Context, uID int64) (*domain
 	return p, nil
 }
 
-func (r *profileRepository) Create(ctx context.Context, p *domain.Profile) error {
+func (r *profileRepository) CreateProfile(ctx context.Context, p *domain.Profile) error {
 	result := r.conn.Create(p)
 	if err := result.Error; err != nil {
 		e, ok := err.(*mysql.MySQLError)
@@ -54,7 +54,7 @@ func (r *profileRepository) Create(ctx context.Context, p *domain.Profile) error
 	return nil
 }
 
-func (r *profileRepository) UpdateByUserID(ctx context.Context, p *domain.Profile) error {
+func (r *profileRepository) UpdateProfile(ctx context.Context, p *domain.Profile) error {
 	result := r.conn.Model(p).Updates(p) // SET 'user_id'も含まれてしまう
 	if err := result.Error; err != nil {
 		return err
@@ -65,8 +65,8 @@ func (r *profileRepository) UpdateByUserID(ctx context.Context, p *domain.Profil
 	return nil
 }
 
-func (r *profileRepository) DeleteByUserID(ctx context.Context, uID int64) error {
-	result := r.conn.Delete(&domain.Profile{})
+func (r *profileRepository) DeleteProfile(ctx context.Context, id int64) error {
+	result := r.conn.Delete(&domain.Profile{ID: id})
 	if err := result.Error; err != nil {
 		return err
 	}

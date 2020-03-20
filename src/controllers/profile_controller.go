@@ -6,7 +6,7 @@ import (
 	"github.com/ezio1119/fishapp-profile/controllers/profile_grpc"
 	"github.com/ezio1119/fishapp-profile/domain"
 	"github.com/ezio1119/fishapp-profile/interactor"
-	"github.com/golang/protobuf/ptypes/wrappers"
+	"github.com/golang/protobuf/ptypes/empty"
 )
 
 type profileController struct {
@@ -17,29 +17,47 @@ func NewProfileController(i interactor.ProfileInteractor) profile_grpc.ProfileSe
 	return &profileController{i}
 }
 
-func (c *profileController) Create(ctx context.Context, in *profile_grpc.CreateReq) (*profile_grpc.Profile, error) {
-	profile := &domain.Profile{
-		Name:   in.Name,
-		UserID: in.UserId,
+func (c *profileController) CreateProfile(ctx context.Context, in *profile_grpc.CreateProfileReq) (*profile_grpc.Profile, error) {
+	p := &domain.Profile{
+		Name:         in.Name,
+		Introduction: in.Introduction,
+		UserID:       in.UserId,
 	}
-	return c.profileInteractor.Create(ctx, profile)
+	if in.Sex == profile_grpc.Sex_MALE {
+		p.Sex = domain.Male
+	}
+	if in.Sex == profile_grpc.Sex_FEMALE {
+		p.Sex = domain.Female
+	}
+	if err := c.profileInteractor.CreateProfile(ctx, p); err != nil {
+		return nil, err
+	}
+	return convProfileProto(p)
 }
 
-func (c *profileController) GetByUserID(ctx context.Context, in *profile_grpc.ID) (*profile_grpc.Profile, error) {
-	return c.profileInteractor.GetByUserID(ctx, in.UserId)
+func (c *profileController) GetProfile(ctx context.Context, in *profile_grpc.GetProfileReq) (*profile_grpc.Profile, error) {
+	p, err := c.profileInteractor.GetProfile(ctx, in.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return convProfileProto(p)
 }
 
-func (c *profileController) UpdateByUserID(ctx context.Context, in *profile_grpc.UpdateReq) (*profile_grpc.Profile, error) {
-	profile := &domain.Profile{
-		Name:   in.Name,
-		UserID: in.UserId,
+func (c *profileController) UpdateProfile(ctx context.Context, in *profile_grpc.UpdateProfileReq) (*profile_grpc.Profile, error) {
+	p := &domain.Profile{
+		Name:         in.Name,
+		Introduction: in.Introduction,
+		UserID:       in.UserId,
 	}
-	return c.profileInteractor.UpdateByUserID(ctx, profile)
+	if err := c.profileInteractor.UpdateProfile(ctx, p); err != nil {
+		return nil, err
+	}
+	return convProfileProto(p)
 }
 
-func (c *profileController) DeleteByUserID(ctx context.Context, in *profile_grpc.ID) (*wrappers.BoolValue, error) {
-	if err := c.profileInteractor.DeleteByUserID(ctx, in.UserId); err != nil {
-		return &wrappers.BoolValue{Value: false}, err
+func (c *profileController) DeleteProfile(ctx context.Context, in *profile_grpc.DeleteProfileReq) (*empty.Empty, error) {
+	if err := c.profileInteractor.DeleteProfile(ctx, in.UserId); err != nil {
+		return nil, err
 	}
-	return &wrappers.BoolValue{Value: true}, nil
+	return &empty.Empty{}, nil
 }
