@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ezio1119/fishapp-profile/domain"
 	"github.com/go-sql-driver/mysql"
@@ -13,6 +14,7 @@ import (
 // Usecase
 type ProfileRepository interface {
 	GetProfileByUserID(ctx context.Context, userID int64) (*domain.Profile, error)
+	BatchGetProfilesByUserIDs(ctx context.Context, userIDs []int64) ([]*domain.Profile, error)
 	UpdateProfile(ctx context.Context, p *domain.Profile) error
 	CreateProfile(ctx context.Context, p *domain.Profile) error
 	DeleteProfile(ctx context.Context, userID int64) error
@@ -34,6 +36,15 @@ func (r *profileRepository) GetProfileByUserID(ctx context.Context, uID int64) (
 		}
 		return nil, err
 	}
+	return p, nil
+}
+
+func (r *profileRepository) BatchGetProfilesByUserIDs(ctx context.Context, userIDs []int64) ([]*domain.Profile, error) {
+	p := []*domain.Profile{}
+	if err := r.conn.Where("user_id IN (?)", userIDs).Find(&p).Error; err != nil {
+		return nil, err
+	}
+	fmt.Println(userIDs)
 	return p, nil
 }
 

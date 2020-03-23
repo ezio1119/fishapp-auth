@@ -23,10 +23,10 @@ func (c *profileController) CreateProfile(ctx context.Context, in *profile_grpc.
 		Introduction: in.Introduction,
 		UserID:       in.UserId,
 	}
-	if in.Sex == profile_grpc.Sex_MALE {
+	switch in.Sex {
+	case profile_grpc.Sex_MALE:
 		p.Sex = domain.Male
-	}
-	if in.Sex == profile_grpc.Sex_FEMALE {
+	case profile_grpc.Sex_FEMALE:
 		p.Sex = domain.Female
 	}
 	if err := c.profileInteractor.CreateProfile(ctx, p); err != nil {
@@ -41,6 +41,20 @@ func (c *profileController) GetProfile(ctx context.Context, in *profile_grpc.Get
 		return nil, err
 	}
 	return convProfileProto(p)
+}
+
+func (c *profileController) BatchGetProfiles(ctx context.Context, in *profile_grpc.BatchGetProfilesReq) (*profile_grpc.BatchGetProfilesRes, error) {
+	p, err := c.profileInteractor.BatchGetProfiles(ctx, in.UserIds)
+	if err != nil {
+		return nil, err
+	}
+	pProto, err := convListProfilesProto(p)
+	if err != nil {
+		return nil, err
+	}
+	return &profile_grpc.BatchGetProfilesRes{
+		Profiles: pProto,
+	}, nil
 }
 
 func (c *profileController) UpdateProfile(ctx context.Context, in *profile_grpc.UpdateProfileReq) (*profile_grpc.Profile, error) {

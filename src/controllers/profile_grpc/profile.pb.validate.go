@@ -202,6 +202,172 @@ var _ interface {
 	ErrorName() string
 } = GetProfileReqValidationError{}
 
+// Validate checks the field values on BatchGetProfilesReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BatchGetProfilesReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	_BatchGetProfilesReq_UserIds_Unique := make(map[int64]struct{}, len(m.GetUserIds()))
+
+	for idx, item := range m.GetUserIds() {
+		_, _ = idx, item
+
+		if _, exists := _BatchGetProfilesReq_UserIds_Unique[item]; exists {
+			return BatchGetProfilesReqValidationError{
+				field:  fmt.Sprintf("UserIds[%v]", idx),
+				reason: "repeated value must contain unique items",
+			}
+		} else {
+			_BatchGetProfilesReq_UserIds_Unique[item] = struct{}{}
+		}
+
+		// no validation rules for UserIds[idx]
+	}
+
+	return nil
+}
+
+// BatchGetProfilesReqValidationError is the validation error returned by
+// BatchGetProfilesReq.Validate if the designated constraints aren't met.
+type BatchGetProfilesReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchGetProfilesReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchGetProfilesReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchGetProfilesReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchGetProfilesReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchGetProfilesReqValidationError) ErrorName() string {
+	return "BatchGetProfilesReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchGetProfilesReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchGetProfilesReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchGetProfilesReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchGetProfilesReqValidationError{}
+
+// Validate checks the field values on BatchGetProfilesRes with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *BatchGetProfilesRes) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	for idx, item := range m.GetProfiles() {
+		_, _ = idx, item
+
+		if v, ok := interface{}(item).(interface{ Validate() error }); ok {
+			if err := v.Validate(); err != nil {
+				return BatchGetProfilesResValidationError{
+					field:  fmt.Sprintf("Profiles[%v]", idx),
+					reason: "embedded message failed validation",
+					cause:  err,
+				}
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// BatchGetProfilesResValidationError is the validation error returned by
+// BatchGetProfilesRes.Validate if the designated constraints aren't met.
+type BatchGetProfilesResValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchGetProfilesResValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchGetProfilesResValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchGetProfilesResValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchGetProfilesResValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchGetProfilesResValidationError) ErrorName() string {
+	return "BatchGetProfilesResValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchGetProfilesResValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchGetProfilesRes.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchGetProfilesResValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchGetProfilesResValidationError{}
+
 // Validate checks the field values on CreateProfileReq with the rules defined
 // in the proto definition for this message. If any rules are violated, an
 // error is returned.

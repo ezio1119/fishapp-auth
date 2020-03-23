@@ -12,6 +12,7 @@ import (
 // Usecase
 type ProfileInteractor interface {
 	GetProfile(ctx context.Context, userID int64) (*domain.Profile, error)
+	BatchGetProfiles(ctx context.Context, userIDs []int64) ([]*domain.Profile, error)
 	UpdateProfile(ctx context.Context, p *domain.Profile) error
 	CreateProfile(ctx context.Context, p *domain.Profile) error
 	DeleteProfile(ctx context.Context, userID int64) error
@@ -31,6 +32,12 @@ func (i *profileInteractor) GetProfile(ctx context.Context, userID int64) (*doma
 	ctx, cancel := context.WithTimeout(ctx, i.ctxTimeout)
 	defer cancel()
 	return i.profileRepository.GetProfileByUserID(ctx, userID)
+}
+
+func (i *profileInteractor) BatchGetProfiles(ctx context.Context, userIDs []int64) ([]*domain.Profile, error) {
+	ctx, cancel := context.WithTimeout(ctx, i.ctxTimeout)
+	defer cancel()
+	return i.profileRepository.BatchGetProfilesByUserIDs(ctx, userIDs)
 }
 
 func (i *profileInteractor) CreateProfile(ctx context.Context, p *domain.Profile) error {

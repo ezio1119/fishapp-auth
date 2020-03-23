@@ -13,11 +13,11 @@ services:
       - "6306:3306"
 
   profile:
-    build:
-      context: .
-      dockerfile: Dockerfile.fresh
-    volumes:
-      - ./src/.:/app
+    build: .
+      # context: .
+      # dockerfile: Dockerfile.fresh
+    # volumes:
+    #   - ./src/.:/app
     depends_on:
       - profile-db
     tty: true
