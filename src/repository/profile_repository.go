@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ezio1119/fishapp-profile/domain"
 	"github.com/go-sql-driver/mysql"
@@ -44,13 +43,11 @@ func (r *profileRepository) BatchGetProfilesByUserIDs(ctx context.Context, userI
 	if err := r.conn.Where("user_id IN (?)", userIDs).Find(&p).Error; err != nil {
 		return nil, err
 	}
-	fmt.Println(userIDs)
 	return p, nil
 }
 
 func (r *profileRepository) CreateProfile(ctx context.Context, p *domain.Profile) error {
-	result := r.conn.Create(p)
-	if err := result.Error; err != nil {
+	if err := r.conn.Create(p).Error; err != nil {
 		e, ok := err.(*mysql.MySQLError)
 		if ok {
 			if e.Number == 1062 {
@@ -59,30 +56,27 @@ func (r *profileRepository) CreateProfile(ctx context.Context, p *domain.Profile
 		}
 		return err
 	}
-	if rows := result.RowsAffected; rows != 1 {
-		return status.Errorf(codes.Internal, "%d rows affected", rows)
-	}
 	return nil
 }
 
 func (r *profileRepository) UpdateProfile(ctx context.Context, p *domain.Profile) error {
-	result := r.conn.Model(p).Updates(p) // SET 'user_id'も含まれてしまう
+	result := r.conn.Model(p).Omit("user_id").Where("user_id = ?", p.UserID).Updates(p)
 	if err := result.Error; err != nil {
 		return err
 	}
-	if rows := result.RowsAffected; rows != 1 {
-		return status.Errorf(codes.Internal, "%d rows affected", rows)
+	if result.RowsAffected == 0 {
+		status.Errorf(codes.NotFound, "profile with user_id='%d' is not found", p.UserID)
 	}
 	return nil
 }
 
-func (r *profileRepository) DeleteProfile(ctx context.Context, id int64) error {
-	result := r.conn.Delete(&domain.Profile{ID: id})
+func (r *profileRepository) DeleteProfile(ctx context.Context, uID int64) error {
+	result := r.conn.Where("user_id = ?", uID).Delete(&domain.Profile{})
 	if err := result.Error; err != nil {
 		return err
 	}
-	if rows := result.RowsAffected; rows != 1 {
-		return status.Errorf(codes.Internal, "%d rows affected", rows)
+	if result.RowsAffected == 0 {
+		status.Errorf(codes.NotFound, "profile with user_id='%d' is not found", uID)
 	}
 	return nil
 }

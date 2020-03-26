@@ -52,9 +52,7 @@ func (c *profileController) BatchGetProfiles(ctx context.Context, in *profile_gr
 	if err != nil {
 		return nil, err
 	}
-	return &profile_grpc.BatchGetProfilesRes{
-		Profiles: pProto,
-	}, nil
+	return &profile_grpc.BatchGetProfilesRes{Profiles: pProto}, nil
 }
 
 func (c *profileController) UpdateProfile(ctx context.Context, in *profile_grpc.UpdateProfileReq) (*profile_grpc.Profile, error) {
@@ -63,10 +61,11 @@ func (c *profileController) UpdateProfile(ctx context.Context, in *profile_grpc.
 		Introduction: in.Introduction,
 		UserID:       in.UserId,
 	}
-	if err := c.profileInteractor.UpdateProfile(ctx, p); err != nil {
+	res, err := c.profileInteractor.UpdateProfile(ctx, p)
+	if err != nil {
 		return nil, err
 	}
-	return convProfileProto(p)
+	return convProfileProto(res)
 }
 
 func (c *profileController) DeleteProfile(ctx context.Context, in *profile_grpc.DeleteProfileReq) (*empty.Empty, error) {

@@ -15,7 +15,7 @@ services:
   profile:
     build: .
       # context: .
-      # dockerfile: Dockerfile.fresh
+      # dockerfile: Dockerfile.dev
     # volumes:
     #   - ./src/.:/app
     depends_on:

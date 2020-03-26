@@ -13,7 +13,7 @@ import (
 type ProfileInteractor interface {
 	GetProfile(ctx context.Context, userID int64) (*domain.Profile, error)
 	BatchGetProfiles(ctx context.Context, userIDs []int64) ([]*domain.Profile, error)
-	UpdateProfile(ctx context.Context, p *domain.Profile) error
+	UpdateProfile(ctx context.Context, p *domain.Profile) (*domain.Profile, error)
 	CreateProfile(ctx context.Context, p *domain.Profile) error
 	DeleteProfile(ctx context.Context, userID int64) error
 }
@@ -46,27 +46,17 @@ func (i *profileInteractor) CreateProfile(ctx context.Context, p *domain.Profile
 	return i.profileRepository.CreateProfile(ctx, p)
 }
 
-func (i *profileInteractor) UpdateProfile(ctx context.Context, p *domain.Profile) error {
+func (i *profileInteractor) UpdateProfile(ctx context.Context, p *domain.Profile) (*domain.Profile, error) {
 	ctx, cancel := context.WithTimeout(ctx, i.ctxTimeout)
 	defer cancel()
-	res, err := i.profileRepository.GetProfileByUserID(ctx, p.UserID)
-	if err != nil {
-		return err
-	}
-	p.ID = res.ID
 	if err := i.profileRepository.UpdateProfile(ctx, p); err != nil {
-		return err
+		return nil, err
 	}
-	p.CreatedAt = res.CreatedAt
-	return nil
+	return i.profileRepository.GetProfileByUserID(ctx, p.UserID)
 }
 
 func (i *profileInteractor) DeleteProfile(ctx context.Context, uID int64) error {
 	ctx, cancel := context.WithTimeout(ctx, i.ctxTimeout)
 	defer cancel()
-	res, err := i.profileRepository.GetProfileByUserID(ctx, uID)
-	if err != nil {
-		return err
-	}
-	return i.profileRepository.DeleteProfile(ctx, res.ID)
+	return i.profileRepository.DeleteProfile(ctx, uID)
 }
