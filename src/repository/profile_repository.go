@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"strings"
 
 	"github.com/ezio1119/fishapp-profile/domain"
 	"github.com/go-sql-driver/mysql"
@@ -40,7 +41,12 @@ func (r *profileRepository) GetProfileByUserID(ctx context.Context, uID int64) (
 
 func (r *profileRepository) BatchGetProfilesByUserIDs(ctx context.Context, userIDs []int64) ([]*domain.Profile, error) {
 	p := []*domain.Profile{}
-	if err := r.conn.Where("user_id IN (?)", userIDs).Find(&p).Error; err != nil {
+	args := make([]interface{}, len(userIDs))
+	for i, uID := range userIDs {
+		args[i] = uID
+	}
+	expr := "FIELD(user_id, ?" + strings.Repeat(",?", len(userIDs)-1) + ")"
+	if err := r.conn.Where("user_id IN (?)", userIDs).Order(gorm.Expr(expr, args...)).Find(&p).Error; err != nil {
 		return nil, err
 	}
 	return p, nil
