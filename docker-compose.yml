@@ -1,10 +1,10 @@
-version: '3'
+version: '3.4'
 services:
   profile-db:
-    image: mysql:8.0.17
+    image: mysql:8.0
     volumes:
       - profile-data:/var/lib/mysql
-    command: --default-authentication-plugin=mysql_native_password
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_ja_0900_as_cs
     environment:
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: profile_DB
@@ -13,11 +13,11 @@ services:
       - "6306:3306"
 
   profile:
-    build: .
-      # context: .
-      # dockerfile: Dockerfile.fresh
-    # volumes:
-    #   - ./src/.:/app
+    build:
+      context: .
+      target: dev
+    volumes:
+      - .:/app
     depends_on:
       - profile-db
     tty: true
@@ -26,8 +26,8 @@ services:
 
 volumes:
   profile-data:
-    driver: local
+
 networks:
   default:
     external:
-      name: api-gateway_default
+      name: fishapp-net

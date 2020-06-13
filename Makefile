@@ -3,16 +3,12 @@ CURRENT_DIR = $(shell pwd)
 API = profile
 
 proto:
-	docker run --rm -w $(CURRENT_DIR) \
-	-v $(CURRENT_DIR)/schema/$(API):/schema \
-	-v $(CURRENT_DIR)/src/controllers/$(API)_grpc:$(CURRENT_DIR) \
-	thethingsindustries/protoc \
-	-I/schema \
-	-I/usr/include/github.com/envoyproxy/protoc-gen-validate \
-	--go_out=plugins=grpc:. \
-	--validate_out="lang=go:." \
-	--doc_out=markdown,README.md:/schema \
-	$(API).proto
+	docker run --rm -v $(CURRENT_DIR)/pb:/pb -v $(CURRENT_DIR)/schema:/proto ezio1119/protoc \
+	-I/proto \
+	-I/go/src/github.com/envoyproxy/protoc-gen-validate \
+	--go_out=plugins=grpc:/pb \
+	--validate_out="lang=go:/pb" \
+	profile.proto
 
 cli:
 	docker run --rm --name grpc_cli --net=api-gateway_default namely/grpc-cli \
@@ -43,4 +39,4 @@ exec:
 	$(DC) exec $(API) sh
 
 logs:
-	docker logs -f --tail 100 $(API)_$(API)_1
+	docker logs -f --tail 100 fishapp-profile_profile_1

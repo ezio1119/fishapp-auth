@@ -1,8 +1,0 @@
-FROM golang:1.13.0-alpine3.10
-
-RUN apk add --no-cache alpine-sdk && \
-    go get github.com/pilu/fresh
-
-ENV GO111MODULE=on
-WORKDIR /app
-CMD ["fresh"]
