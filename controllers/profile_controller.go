@@ -59,18 +59,20 @@ func (c *profileController) BatchGetProfiles(ctx context.Context, in *pb.BatchGe
 
 func (c *profileController) UpdateProfile(ctx context.Context, in *pb.UpdateProfileReq) (*pb.Profile, error) {
 	p := &domain.Profile{
+		ID:           in.Id,
 		Name:         in.Name,
 		Introduction: in.Introduction,
-		UserID:       in.UserId,
 	}
+
 	if err := c.profileInteractor.UpdateProfile(ctx, p); err != nil {
 		return nil, err
 	}
+
 	return convProfileProto(p)
 }
 
 func (c *profileController) DeleteProfile(ctx context.Context, in *pb.DeleteProfileReq) (*empty.Empty, error) {
-	if err := c.profileInteractor.DeleteProfile(ctx, in.UserId); err != nil {
+	if err := c.profileInteractor.DeleteProfile(ctx, in.Id); err != nil {
 		return nil, err
 	}
 	return &empty.Empty{}, nil

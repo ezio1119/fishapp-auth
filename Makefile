@@ -11,17 +11,17 @@ proto:
 	profile.proto
 
 cli:
-	docker run --rm --name grpc_cli --net=api-gateway_default namely/grpc-cli \
-	call $(API):50051 $(API)_grpc.ProfileService.$(m) "$(q)" $(o)
+	docker run --rm --name grpc_cli --net=fishapp-net znly/grpc_cli \
+	call $(API):50051 $(API).ProfileService.$(m) "$(q)"
 
 sqldoc:
-	docker run --rm --net=api-gateway_default -v $(CURRENT_DIR)/db:/work ezio1119/tbls \
+	docker run --rm --net=fishapp-net -v $(CURRENT_DIR)/db:/work ezio1119/tbls \
 	doc -f -t svg mysql://root:password@${API}-db:3306/${API}_DB ./
 
 migrate:
-	docker run --rm -it --name migrate --net=api-gateway_default \
+	docker run --rm -it --name migrate --net=fishapp-net \
 	-v $(CURRENT_DIR)/db/sql:/sql migrate/migrate:latest \
-	-path /sql/ -database "mysql://root:password@tcp($(API)-db:3306)/$(API)_DB" up
+	-path /sql/ -database "mysql://root:password@tcp($(API)-db:3306)/$(API)_DB" ${a}
 
 up:
 	$(DC) up -d

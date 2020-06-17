@@ -469,6 +469,13 @@ func (m *UpdateProfileReq) Validate() error {
 		return nil
 	}
 
+	if m.GetId() < 1 {
+		return UpdateProfileReqValidationError{
+			field:  "Id",
+			reason: "value must be greater than or equal to 1",
+		}
+	}
+
 	if l := utf8.RuneCountInString(m.GetName()); l < 1 || l > 10 {
 		return UpdateProfileReqValidationError{
 			field:  "Name",
@@ -480,13 +487,6 @@ func (m *UpdateProfileReq) Validate() error {
 		return UpdateProfileReqValidationError{
 			field:  "Introduction",
 			reason: "value length must be between 1 and 1000 runes, inclusive",
-		}
-	}
-
-	if m.GetUserId() < 1 {
-		return UpdateProfileReqValidationError{
-			field:  "UserId",
-			reason: "value must be greater than or equal to 1",
 		}
 	}
 
@@ -555,9 +555,9 @@ func (m *DeleteProfileReq) Validate() error {
 		return nil
 	}
 
-	if m.GetUserId() < 1 {
+	if m.GetId() < 1 {
 		return DeleteProfileReqValidationError{
-			field:  "UserId",
+			field:  "Id",
 			reason: "value must be greater than or equal to 1",
 		}
 	}

@@ -29,8 +29,7 @@ func main() {
 		panic(err)
 	}
 
-	err = server.Serve(list)
-	if err != nil {
+	if err = server.Serve(list); err != nil {
 		panic(err)
 	}
 }
